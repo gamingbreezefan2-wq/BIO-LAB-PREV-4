@@ -1,0 +1,896 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BIO 201B Fall 2019 Midterm Quiz</title>
+<style>
+:root{
+  --bg:#f6f4ef; --card:#ffffff; --ink:#1c1b18; --muted:#5f5b52; --line:#dedad0;
+  --accent:#0e6b62; --accent-soft:#e1f0ed; --ok:#2c7a4b; --ok-soft:#e3f3e8;
+  --bad:#b23a29; --bad-soft:#fbe6e2; --warn:#9a6a00; --warn-soft:#fbf1d8;
+  --chip:#efece4; --shadow:0 1px 2px rgba(0,0,0,.05),0 2px 10px rgba(0,0,0,.04); --on-accent:#ffffff;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#15171a; --card:#1e2125; --ink:#e9e7e2; --muted:#a39f96; --line:#33373d;
+    --accent:#5cc2b5; --accent-soft:#1b3431; --ok:#6ccb8f; --ok-soft:#1c3226;
+    --bad:#f08a78; --bad-soft:#3a2220; --warn:#e3b94f; --warn-soft:#352c16;
+    --chip:#2a2e33; --shadow:none; --on-accent:#0f1a19;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px 80px}
+h1,h2{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;font-weight:600;letter-spacing:-.01em}
+h1{font-size:clamp(1.6rem,4.5vw,2.2rem);margin:28px 0 6px;line-height:1.2}
+h2{font-size:1.35rem;margin:40px 0 4px;scroll-margin-top:80px}
+.summary{scroll-margin-top:80px}
+.lede{color:var(--muted);margin:0 0 14px;max-width:64ch}
+.sec-note{color:var(--muted);margin:0 0 14px;font-size:.95rem}
+.legend{display:flex;flex-wrap:wrap;gap:6px 8px;margin:10px 0 0;font-size:.82rem}
+details.left-out{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:14px 0;font-size:.92rem}
+details.left-out summary{cursor:pointer;font-weight:600}
+details.left-out ul{margin:8px 0 4px;padding-left:20px}
+/* top bar */
+.bar{position:sticky;top:0;z-index:20;background:var(--bg);background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar-in{max-width:860px;margin:0 auto;padding:10px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px}
+.score{font-variant-numeric:tabular-nums;font-weight:600;min-width:0}
+.score small{display:block;font-weight:400;color:var(--muted);font-size:.78rem}
+.nav{display:flex;gap:4px;flex-wrap:wrap}
+.nav a{font-size:.82rem;text-decoration:none;color:var(--ink);background:var(--chip);padding:4px 9px;border-radius:999px}
+.nav a:hover{background:var(--accent-soft)}
+.bar .spacer{flex:1}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 12px}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,.opt:focus-within,.chip:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.toggle{display:inline-flex;align-items:center;gap:6px;font-size:.85rem;color:var(--muted);user-select:none}
+/* cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 16px 14px;margin:12px 0;box-shadow:var(--shadow)}
+.card[data-state="right"]{border-left:4px solid var(--ok)}
+.card[data-state="wrong"]{border-left:4px solid var(--bad)}
+.card[data-state="partial"]{border-left:4px solid var(--warn)}
+.card[data-state="pending"]{border-left:4px solid var(--accent)}
+body.missed-only .card[data-state="right"]{display:none}
+.qhead{display:flex;gap:10px;align-items:baseline}
+.qnum{font-weight:700;color:var(--accent);min-width:2.2em;font-variant-numeric:tabular-nums}
+.qtext{flex:1;min-width:0}
+.pts{font-size:.75rem;color:var(--muted);white-space:nowrap}
+.opts{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:8px;cursor:pointer;background:transparent}
+.opt:hover{border-color:var(--accent)}
+.opt input{margin:4px 0 0;accent-color:var(--accent)}
+.opt .L{font-weight:600;color:var(--muted);min-width:1.4em}
+.opt .otext{flex:1;min-width:0}
+.onote{display:none;font-size:.84rem;color:var(--muted);margin-top:3px}
+.card.checked .onote{display:block}
+.opt.is-correct{border-color:var(--ok);background:var(--ok-soft)}
+.opt.is-correct .onote{color:var(--ok)}
+.opt.is-wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opts.tf{grid-template-columns:repeat(2,minmax(0,1fr))}
+.actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;align-items:center}
+.actions button{font-size:.88rem;padding:6px 11px}
+.fb{margin-top:12px;padding:12px 14px;border-radius:8px;background:var(--chip);display:none}
+.fb.show{display:block}
+.fb .verdict{font-weight:700;margin-bottom:4px}
+.fb .verdict.ok{color:var(--ok)} .fb .verdict.bad{color:var(--bad)} .fb .verdict.part{color:var(--warn)}
+.fb p{margin:6px 0}
+.fb ul,.fb ol{margin:6px 0;padding-left:20px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{font-size:.74rem;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:600}
+.tag.ext{background:var(--warn-soft);color:var(--warn)}
+.tag.low{background:var(--bad-soft);color:var(--bad)}
+.tag.gr{background:transparent;border:1px solid var(--line);color:var(--ink)}
+/* inputs */
+input[type=text],select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px 8px}
+input.blank{width:11em;max-width:100%;margin:2px 2px}
+input.blank.short{width:5em}
+input.ok,select.ok{border-color:var(--ok);background:var(--ok-soft)}
+input.bad,select.bad{border-color:var(--bad);background:var(--bad-soft)}
+.fix{font-size:.82rem;color:var(--ok);font-weight:600;margin-left:4px}
+.fill-line{line-height:2.3}
+textarea{width:100%;min-height:84px;margin-top:10px;resize:vertical}
+textarea.small{min-height:56px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;align-items:center;margin-top:10px}
+.grid .lab,.grid > div{min-width:0}
+select{max-width:100%}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:999px;padding:3px 10px 3px 8px;cursor:pointer;font-size:.92rem;background:var(--bg)}
+.chip input{accent-color:var(--accent);margin:0}
+.chips.ok .chip{border-color:var(--ok)} .chips.bad .chip{border-color:var(--bad)}
+.chip.need{background:var(--ok-soft);border-color:var(--ok)}
+.model{border-left:3px solid var(--accent);padding-left:10px}
+.self{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.self span{font-size:.85rem;color:var(--muted);margin-right:4px}
+.self button.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.tfcorr{margin-top:8px}
+.tfcorr label{font-size:.85rem;color:var(--muted)}
+/* figures & tables */
+figure{margin:12px 0 4px}
+figure svg{max-width:100%;height:auto;display:block}
+figcaption{font-size:.8rem;color:var(--muted);margin-top:4px}
+.tw{overflow-x:auto;margin:10px 0;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;font-size:.9rem;min-width:100%}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:var(--chip);font-weight:600}
+.given{color:var(--muted);font-style:italic}
+.grid select{min-width:11em}
+.qtable select{min-width:7.5em}
+.qtable input.blank{width:5.5em}
+.rxn{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.85rem;background:var(--chip);padding:8px 10px;border-radius:6px;overflow-x:auto;white-space:nowrap}
+.problem-intro{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin:16px 0 4px}
+.problem-intro h3{margin:0 0 6px;font-size:1.05rem}
+.problem-intro p{margin:6px 0}
+.summary{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:18px 0;display:none}
+.summary.show{display:block}
+.summary table{min-width:0}
+.foot{color:var(--muted);font-size:.85rem;margin-top:40px;border-top:1px solid var(--line);padding-top:14px}
+@media (max-width:560px){
+  .grid{grid-template-columns:minmax(0,1fr)}
+  .card{padding:14px 12px}
+  .bar-in{gap:6px 10px}
+  .qtable{font-size:.85rem}
+  .qtable select{min-width:0;max-width:7.5em;font-size:.85rem}
+  .qtable td,.qtable th{padding:5px 6px}
+  .bar-in{padding:8px 12px}
+  .bar button{font-size:.85rem;padding:5px 10px}
+  .nav a{padding:3px 8px}
+  .score{font-size:.95rem}
+  .grid select{min-width:0;width:100%}
+}
+@media print{
+  .bar,.actions,.self{display:none}
+  .card{break-inside:avoid;box-shadow:none}
+}
+</style>
+</head>
+<body>
+<div class="bar"><div class="bar-in">
+  <div class="score" id="score">0 / 0 points<small>Nothing checked yet</small></div>
+  <nav class="nav" aria-label="Sections">
+    <a href="#sec1">I</a><a href="#sec2">II</a><a href="#sec3">III</a><a href="#sec4">IV</a><a href="#sec5">V</a><a href="#sec6">VI</a>
+  </nav>
+  <span class="spacer"></span>
+  <label class="toggle"><input type="checkbox" id="missedOnly"> Missed only</label>
+  <button class="primary" id="gradeAll">Grade everything</button>
+  <button id="resetAll">Reset</button>
+</div></div>
+
+<main class="wrap">
+  <h1>BIO 201B Fall 2019 Midterm, as a quiz</h1>
+  <p class="lede">The Fall 2019 lab midterm, cut down to Labs 1–5 and rebuilt so you can fill it in. Answer a question, then press <b>Check</b>, or press <b>Grade everything</b> at the top. Every answer comes with an explanation, and the tags underneath show its source.</p>
+  <div class="legend">
+    <span class="tag">Lab 1–4 slides</span>
+    <span class="tag">Your worksheets</span>
+    <span class="tag ext">Not on the slides</span>
+    <span class="tag gr">Matches your graded paper</span>
+  </div>
+  <p class="sec-note" style="margin-top:10px"><b>Only Labs 1–5 are included:</b> biomolecules, the microscope, the cell, mitosis &amp; meiosis, and diffusion &amp; osmosis. Questions from the enzyme, respiration and photosynthesis labs are left out (list below). Questions tagged <b>Not on the slides</b> are on a Lab 1–5 topic, but the slides don’t spell the answer out. Those use standard textbook answers. <b>Matches your graded paper</b> means the grader’s marks on your scanned copy confirm the answer. Written answers come with a model answer, and you mark yourself (full, half or none) so the score stays honest. Your answers are saved in this browser.</p>
+
+  <details class="left-out">
+    <summary>What was left out, and why</summary>
+    <ul>
+      <li><b>Multiple choice (8):</b> the enzyme rate graph, the potato-extract enzyme (catechol oxidase), the factors that alter maltose hydrolysis, activation energy and L-amino acid dehydrogenase come from the enzyme lab. Fermentation, cellular respiration and the energy conversion in photosynthesis come from the respiration and photosynthesis labs.</li>
+      <li><b>True/False (1):</b> “PTU binds zinc and copper”, from the enzyme lab.</li>
+      <li><b>Fill in the blanks (5 blanks):</b> where proteins and lipids are digested, and “enzymes can be proteins or ___ / active site”.</li>
+      <li><b>Problems B, C, E and F:</b> lipase, peroxidase, the digestive enzyme pH graphs, and trypsin. All four are enzyme experiments.</li>
+      <li><b>Not in your scan:</b> Problem G. Also, pages 17 and 18 of the PDF are the same photo, so a page may be missing.</li>
+    </ul>
+    <p style="margin:6px 0 0">The question bullets on the paper aren’t numbered, and the photos were out of order, so the numbering here is new.</p>
+  </details>
+
+  <div class="summary" id="summary"></div>
+
+  <h2 id="sec1">I. Circle the best answer</h2>
+  <p class="sec-note">Only one answer is correct. 32 questions, 0.5 pt each (16 pts). After you check, every choice shows why it is right or wrong.</p>
+  <div id="s1"></div>
+
+  <h2 id="sec2">II. True or False (correct the false)</h2>
+  <p class="sec-note">6 statements, 0.5 pt each (3 pts). The quiz grades your True/False choice. On the exam you also have to correct the false ones, so write your correction in the box and compare it with the model.</p>
+  <div id="s2"></div>
+
+  <h2 id="sec3">III. Fill in the blanks</h2>
+  <p class="sec-note">10 blanks, 0.5 pt each (5 pts). Spelling is checked loosely, and common synonyms are accepted.</p>
+  <div id="s3"></div>
+
+  <h2 id="sec4">IV. Matching (more than 1 answer could be possible)</h2>
+  <p class="sec-note">9 items, 0.5 pt each (4.5 pts). Tick every letter that fits.</p>
+  <div id="s4"></div>
+
+  <h2 id="sec5">V. Questions with short answers</h2>
+  <p class="sec-note">14.5 pts. Part C is worth 2 pts on the paper, but its “0.25 each” only adds up to 1 pt, so each part counts 0.5 here.</p>
+  <div id="s5"></div>
+
+  <h2 id="sec6">VI. Problems</h2>
+  <p class="sec-note">Problems A, D and H (22 pts). B, C, E and F were enzyme experiments, so they’re left out.</p>
+  <div id="s6"></div>
+
+  <p class="foot">Built from your scanned Fall 2019 midterm and your BIO 201B material: Lab 1 (Biologically Important Molecules), Lab 2 (The Microscope), Lab 3 (Cell Structure and Function), Lab 4 (Mitosis &amp; Meiosis), plus your graded Lab 1 and Diffusion &amp; Osmosis worksheets. The apparatus in Problem D is redrawn from the exam.</p>
+</main>
+
+<script>
+(function(){
+"use strict";
+
+var L="abcdefghij";
+var T_L1='<span class="tag">Lab 1 slides</span>';
+var T_L2='<span class="tag">Lab 2 slides</span>';
+var T_L3='<span class="tag">Lab 3 slides</span>';
+var T_L4='<span class="tag">Lab 4 slides</span>';
+var T_DO='<span class="tag">Diffusion &amp; Osmosis worksheet</span>';
+var T_W1='<span class="tag">Your Lab 1 worksheet</span>';
+var T_EXT='<span class="tag ext">Not on the slides</span>';
+var T_GR='<span class="tag gr">Matches your graded paper</span>';
+function topic(n){return '<span class="tag">Lab '+n+' topic</span>';}
+function ext(s){return '<span class="tag ext">'+s+'</span>';}
+
+/* ---------- figure: Problem D apparatus ---------- */
+function utubeSVG(){
+  return '<svg viewBox="0 0 440 250" role="img" aria-label="U-shaped tube divided by a semipermeable membrane at the bottom. Side A on the left holds water with iodine; side B on the right holds 10% starch in water. Both liquid levels start at the same height." style="color:var(--ink);max-width:440px">'+
+  '<rect x="122" y="70" width="44" height="122" fill="#b7852a" opacity=".28"/>'+
+  '<path d="M122 192 Q122 222 152 222 L216 222 L216 192 L166 192 Z" fill="#b7852a" opacity=".28"/>'+
+  '<rect x="274" y="70" width="44" height="122" fill="var(--accent)" opacity=".16"/>'+
+  '<path d="M318 192 Q318 222 288 222 L224 222 L224 192 L274 192 Z" fill="var(--accent)" opacity=".16"/>'+
+  '<path d="M122 30 L122 192 Q122 222 152 222 L288 222 Q318 222 318 192 L318 30" fill="none" stroke="currentColor" stroke-width="2.2"/>'+
+  '<path d="M166 30 L166 182 Q166 192 176 192 L264 192 Q274 192 274 182 L274 30" fill="none" stroke="currentColor" stroke-width="2.2"/>'+
+  '<line x1="122" y1="70" x2="166" y2="70" stroke="currentColor" stroke-width="1.3" stroke-dasharray="4 3"/>'+
+  '<line x1="274" y1="70" x2="318" y2="70" stroke="currentColor" stroke-width="1.3" stroke-dasharray="4 3"/>'+
+  '<rect x="216" y="190" width="8" height="34" fill="currentColor"/>'+
+  '<text x="144" y="20" text-anchor="middle" font-size="14" font-weight="700" fill="currentColor">Side A</text>'+
+  '<text x="296" y="20" text-anchor="middle" font-size="14" font-weight="700" fill="currentColor">Side B</text>'+
+  '<text x="112" y="140" text-anchor="end" font-size="12" fill="currentColor">Water with</text>'+
+  '<text x="112" y="155" text-anchor="end" font-size="12" fill="currentColor">iodine</text>'+
+  '<text x="328" y="140" font-size="12" fill="currentColor">10% starch</text>'+
+  '<text x="328" y="155" font-size="12" fill="currentColor">in water</text>'+
+  '<text x="220" y="243" text-anchor="middle" font-size="12" fill="currentColor">Semipermeable membrane</text>'+
+  '<text x="220" y="64" text-anchor="middle" font-size="10.5" fill="var(--muted)">same starting level</text>'+
+  '</svg>';
+}
+
+/* ---------- I. Multiple choice ---------- */
+var S1=[
+{q:'The absorption rate of water _______ with increased salt concentration in t… <span style="color:var(--muted);font-size:.85rem">(the end of this line is cut off in the photo)</span>',
+ o:['Remains unchanged','Increases','Decreases','No effect'],a:2,
+ n:['Osmosis depends on the difference in concentration, so changing the salt changes it.','More salt outside the cells draws water out, not in.','Correct.','Same problem as a: salt concentration is exactly what drives osmosis.'],
+ w:'Read the cut-off end as the salt in the solution around the cells (your paper’s “Decreases” was marked correct). Water moves by osmosis toward the side with more solute. The saltier the outside, the less water moves in, and above the cells’ own concentration water moves out. Your potato cylinders show this: they gained mass in 0% salt and lost mass in 30%.',t:T_DO+T_GR},
+{q:'_______ cells are genetically identical to the zygote from wh… <span style="color:var(--muted);font-size:.85rem">(cut off in the photo)</span>',
+ o:['Somatic cells','Germ-line','Sex cells','All of the above'],a:0,
+ n:['Correct: body cells come from the zygote by mitosis only.','The germ line is the line of cells that produces gametes. It ends in meiosis, so its products aren’t identical to the zygote.','Sex cells (gametes) come from meiosis: haploid, with crossed-over chromatids.','Only somatic cells qualify.'],
+ w:'Every body (somatic) cell descends from the zygote by mitosis, and mitosis produces two identical nuclei, each with a copy of all of the genetic information (Lab 4). Gametes are made by meiosis, which halves the chromosome number and creates new genetic combinations by crossing over, so they are not identical to the zygote.',t:T_L4+ext('Term “somatic” not on the slides')},
+{q:'If the synthesis of a protein released 98 molecules of water, the protein is made of',
+ o:['97 amino acids','98 amino acids','99 amino acids','100 amino acids','Not enough information'],a:2,
+ n:['97 amino acids form only 96 bonds, so 96 waters.','There is one water per bond, but a chain has one more amino acid than it has bonds.','Correct.','100 amino acids form 99 bonds, so 99 waters.','It can be calculated: number of bonds = number of amino acids − 1.'],
+ w:'Each peptide bond (the C–N bond that the Biuret test detects, Lab 1) forms by removing one water molecule. 98 waters released means 98 peptide bonds. A single chain of <i>n</i> amino acids has <i>n</i> − 1 bonds, so <i>n</i> = 99. The question assumes one polypeptide chain, and your paper’s 99 was marked correct.',t:topic(1)+T_GR},
+{q:'Working distance is the',
+ o:['Distance from your house to your job','Distance the microscope nosepiece travels using the coarse focus knob','Distance from the bottom of the objective lens to the specimen','Distance the specimen can travel across the microscope stage'],a:2,
+ n:['A joke option.','That’s how far the focusing mechanism moves, not the working distance.','Correct.','That’s how far the stage controls move the slide sideways.'],
+ w:'Lab 2: the working distance “is the distance between the objective lens and specimen.” It decreases as you switch to higher-power objectives.',t:T_L2},
+{q:'When using the high power objective, you should not adjust the',
+ o:['Coarse focus','Fine focus','Diaphragm','Stage clips'],a:0,
+ n:['Correct.','The fine knob is exactly what you use with the 40× objective.','You often open the diaphragm at high power, because the image gets dimmer as magnification increases.','The clips only hold the slide in place. They have nothing to do with focusing.'],
+ w:'Lab 2: the coarse adjustment knob “is used only when you’re viewing a specimen with the 4× or 10× objective lens”. The fine knob is used with the 40× (or higher) objective. The working distance at 40× is tiny, so one turn of the coarse knob could crash the objective into the slide.',t:T_L2},
+{q:'Which one of these structures is not part of the cytoplasm',
+ o:['Ribosomes','DNA','Mitochondria','Microtubules'],a:1,
+ n:['Ribosomes float in the cytosol or sit on the rough ER, both in the cytoplasm.','Correct: the chromosomes are inside the nucleus.','Mitochondria are organelles in the cytoplasm.','Microtubules are part of the cytoskeleton in the cytoplasm (they also build the spindle).'],
+ w:'In a eukaryotic cell the cytoplasm is everything between the plasma membrane and the nucleus: the cytosol plus the organelles. The cell’s DNA (its chromosomes) is enclosed in the nucleus by the double nuclear envelope (Lab 3), so it isn’t part of the cytoplasm. Ribosomes, mitochondria and microtubules all sit in the cytoplasm.',t:T_L3+T_GR},
+{q:'The process of cytoplasmic streaming:',
+ o:['Decreases when temperature increases','Increases when temperature decreases','Not affected by temperature','The intracellular motion performed by microfilaments'],a:3,
+ n:['Backwards: warming (within the normal range) speeds streaming up.','Backwards: cooling slows it down, because molecules have less kinetic energy.','It is temperature-sensitive.','Correct.'],
+ w:'Cytoplasmic streaming is the flowing of the cytoplasm inside a cell, driven by microfilaments. In Elodea leaf cells you can watch the chloroplasts being carried around. It depends on temperature: colder means less kinetic energy and slower streaming, so a, b and c are all wrong.',t:topic(3)+T_EXT+T_GR},
+{q:'Where are ribosomes produced in a eukaryotic cell?',
+ o:['SER','RER','Vacuole','Nucleolus'],a:3,
+ n:['The smooth ER has no ribosomes. It makes lipids.','Ribosomes attach to the RER to make proteins there, but they aren’t made there.','The vacuole stores water, ions, molecules and wastes (Lab 3).','Correct.'],
+ w:'Ribosomes are made in the nucleolus, the dense spot inside the nucleus. Lab 3 shows where it is in Elodea but not what it does. It makes ribosomal RNA and assembles the ribosome subunits, which then leave through the nuclear pores. The RER is where ribosomes work, not where they’re made.',t:T_L3+ext('Nucleolus function not on the slides')},
+{q:'Electron microscopes can be:',
+ o:['Nomarski','Inverted','Scanning','Dissecting'],a:2,
+ n:['Nomarski (differential interference contrast) is a kind of light microscope.','An inverted microscope is a light microscope with the objectives under the stage.','Correct.','The dissecting (stereo) microscope is a light microscope (Lab 2).'],
+ w:'Lab 2 names two electron microscopes: the <b>transmission</b> EM (thin-sectioned, metal-stained dead specimen) and the <b>scanning</b> EM (metal-coated surface of a dead specimen, giving 3-D images).',t:T_L2},
+{q:'In sucrose a _______ bond occurs between glucose and _______.',
+ o:['Glycosidic, galactose','Peptide, galactose','Glycosidic, fructose','Peptide, fructose'],a:2,
+ n:['Glucose + galactose is lactose (milk sugar).','Peptide bonds join amino acids, and the partner sugar is wrong too.','Correct.','Right partner, wrong bond: peptide bonds are found in proteins.'],
+ w:'Sucrose is a disaccharide of glucose + fructose joined by a glycosidic bond. Lab 1: disaccharides are reducing sugars <i>except sucrose</i>, which is why sucrose stayed blue in your Benedict’s test while glucose turned red.',t:topic(1)+T_W1},
+{q:'In organisms that have sexual life cycles there is a time when there are',
+ o:['1n gametes (haploid), followed by 2n zygotes (diploid)','2n gametes (haploid), followed by 1n zygotes (diploid)','2n gametes (diploid), followed by 1n zygotes (haploid)','1n gametes (diploid), followed by 2n zygotes (haploid)'],a:0,
+ n:['Correct.','2n means diploid, not haploid, and the zygote is 2n.','Gametes are n, not 2n, and the zygote is 2n, not n.','1n means haploid, not diploid, and 2n means diploid.'],
+ w:'Lab 4: fusion of a haploid (n) egg nucleus with a haploid (n) sperm nucleus produces a diploid (2n) zygote, which then forms the embryo.',t:T_L4},
+{q:'All are organic compounds, EXCEPT:',
+ o:['Vitamins','Minerals','Carbohydrates','Nucleic acids'],a:1,
+ n:['Vitamins are carbon-based organic molecules.','Correct.','One of the four groups you tested in Lab 1.','DNA and RNA are organic. You tested DNA with Dische diphenylamine.'],
+ w:'Organic compounds are carbon-based molecules made by living things. Carbohydrates, proteins, lipids and nucleic acids are the four groups tested in Lab 1, and vitamins are carbon-based too. Minerals (calcium, iron, sodium…) are inorganic elements and ions.',t:topic(1)+T_EXT},
+{q:'Which type of microscope is used to observe living cells?',
+ o:['Light microscope','Transmission electron microscope','Scanning electron microscope','Inverted microscope'],a:3,
+ n:['An ordinary light microscope can show some living cells (Elodea in water, for example), but the microscope designed for living cells is the inverted one, which is the answer your paper was marked right for.','A TEM needs a dead, thin-sectioned, metal-stained specimen.','An SEM needs a dead, metal-coated specimen.','Correct.'],
+ w:'Both electron microscopes work only on dead specimens (Lab 2), so b and c are out. The <b>inverted microscope</b> is the light microscope built for living cells: its objectives sit below the stage, so cells growing in a dish or flask of medium can be viewed through the bottom of the container. Your graded paper marked d correct.',t:T_L2+ext('Inverted microscope not on the slides')+T_GR},
+{q:'In an attempt to replenish the body fluids, a patient (who has hemorrhage) accidentally receives a large transfusion of distilled water directly into one of his veins. This would probably',
+ o:['Have no unfavorable effect as long as the water was sterile','Have serious fatal effects because there would be too much fluid for the heart to pump','Have serious fatal effects because the RBCs would tend to shrivel','Have serious fatal effects because the red blood cells would tend to burst'],a:3,
+ n:['Being sterile doesn’t change the tonicity.','Volume isn’t the problem here; tonicity is.','Cells shrivel in a hypertonic solution. Distilled water is hypotonic.','Correct.'],
+ w:'Red blood cells are isotonic with about 0.9% NaCl (see Part V-D). Distilled water is strongly hypotonic, so water rushes into the cells by osmosis. Animal cells have no cell wall to resist the swelling, so they burst.',t:topic(5)+T_DO},
+{q:'In the scenario described in the previous question, which way would water move?',
+ o:['Into the blood cells','Out of the blood cells','Both into and out of, but with no net change','Water would not be moving'],a:0,
+ n:['Correct.','That happens in a hypertonic solution.','No net change only happens when the solution is isotonic.','Water molecules never stop moving.'],
+ w:'Water moves from where it is more concentrated (the distilled water outside) to where it is less concentrated (inside the cells, where the solutes are). Molecules cross both ways, but the net flow is strongly into the cells.',t:topic(5)+T_DO},
+{q:'Which of the following regulates the amount of light passing through the slide specimen on the microscope stage?',
+ o:['Objective','Condenser','Iris diaphragm lever','Fine adjustment knob'],a:2,
+ n:['The objective magnifies the image.','The condenser lens focuses light onto the specimen. It doesn’t set the amount.','Correct.','The fine knob focuses at high power.'],
+ w:'Lab 2: the condenser iris diaphragm is a ring or lever that is opened and closed to regulate the amount of light reaching the specimen: open gives a bright image, closed a dim one.',t:T_L2+T_GR},
+{q:'Which of the following would be an example of osmosis?',
+ o:['The smell of ammonia spreading throughout the room','The shriveling of a snail after salt is poured on it','Water being poured into a glass','The absorption of water by a bathroom sponge','All of the above'],a:1,
+ n:['Gas molecules spreading through air is diffusion, with no membrane involved.','Correct.','Pouring is bulk flow: no membrane and no concentration gradient.','A sponge soaks water into its pores; nothing crosses a membrane.','Only b is osmosis.'],
+ w:'Osmosis is the movement of water across a differentially (selectively) permeable membrane. Salt makes the outside of the snail’s cells hypertonic, so water leaves the cells across their membranes and the snail shrivels. Your onion cells in 30% NaCl plasmolyzed the same way.',t:T_DO},
+{q:'A beaker is divided into two halves A &amp; B by a membrane impermeable to NaCl. Side A has 2% NaCl solution, while side B has 4% NaCl solution.',
+ o:['Water will move from A to B','Water will move from B to A','Water will move equally in both directions','Water will move in both directions but mostly from A to B','Water will move in both directions but mostly from B to A'],a:3,
+ n:['This is the net flow only. Water also keeps moving from B to A, so d is the full picture (your paper’s a was marked wrong).','Backwards: water moves toward the higher salt concentration.','Equal movement both ways only happens when the two sides are isotonic.','Correct.','The net flow goes toward B, not A.'],
+ w:'Only water can cross. Side A (2% NaCl) has more water than side B (4%). Water molecules move both ways all the time, because they never stop moving (your worksheet, Exercise 1c), but more cross from A to B. So the net flow is A → B, and the level on side B rises.',t:T_DO},
+{q:'Depth of field is best demonstrated with',
+ o:['A slide showing the letter e','A slide containing overlapping threads','A wet mount slide preparation','The oil immersion lens'],a:1,
+ n:['The letter e shows the image is inverted and moves opposite to the slide.','Correct.','The wet mount (Exercise 3) is for preparing and viewing a specimen.','The oil immersion lens is for 100× viewing. It isn’t how depth of field is demonstrated.'],
+ w:'Lab 2, Exercise 2 (Determining the Depth of Field): three colored threads overlap at different depths. All three can be in focus at once at low power, but not at high power.',t:T_L2},
+{q:'Which monosaccharide is also known as milk sugar?',
+ o:['Glucose','Fructose','Galactose','Lactose'],a:3,
+ n:['Glucose is the sugar in blood and the unit of starch.','Fructose is fruit sugar.','Galactose is one of the two units of lactose, but it isn’t called milk sugar.','Correct, even though lactose isn’t actually a monosaccharide.'],
+ w:'Milk sugar is lactose (Lab 3: <i>Lactobacillus</i> “is adapted to live on milk sugar (lactose)”). The question’s word “monosaccharide” is a slip: lactose is a <b>disaccharide</b> (glucose + galactose). No monosaccharide is called milk sugar, so lactose is the only possible answer.',t:T_L3},
+{q:'The main outcome of the four stages of meiosis II is to separate _______.',
+ o:['Sister chromosomes','Homologous chromatids','Sister chromatids','Homologous chromosomes'],a:2,
+ n:['“Sister chromosomes” isn’t a real term. Sisters are chromatids.','The terms are mixed up.','Correct.','Homologous chromosomes separate in meiosis I (anaphase I).'],
+ w:'Lab 4: in anaphase II, sister chromatids separate and move to opposite poles, and telophase II ends with 4 cells. Homologous chromosomes were already separated in anaphase I.',t:T_L4},
+{q:'I am doing an experiment on osmosis. I take some dialysis tubing (a semi-permeable membrane) and fill it with a 50% sugar solution. If I want to make the cell gain weight, which beaker should I place it into?',
+ o:['Beaker of 20% sugar solution','Beaker of 50% sugar solution','Beaker of 90% sugar solution','Beaker of any type of sugar solution','None of these conditions would cause the cell to gain weight'],a:0,
+ n:['Correct.','Isotonic: no net change in weight.','The beaker is hypertonic, so the bag loses weight.','It depends on the concentration.','Option a works.'],
+ w:'To gain weight the bag has to be hypertonic to the beaker, so the beaker must contain <b>less</b> sugar than the bag’s 50%. Water then moves into the bag by osmosis. It’s the same as your bags C and D (10% and 20% sucrose in 1%), which gained mass.',t:T_DO},
+{q:'Resolution is:',
+ o:['The ability to distinguish 2 objects lying close together as one object','The ability to distinguish 2 objects lying close together as separate objects','The ability to distinguish 2 objects lying far as one object','The ability to distinguish 2 objects lying far as separate objects'],a:1,
+ n:['Seeing two close objects as one is exactly what poor resolution looks like.','Correct.','Resolution is about objects that are close together.','Objects far apart are easy to tell apart. Resolution is about close ones.'],
+ w:'Lab 2: “Resolution is the ability to distinguish two points as separate points.” The unaided eye resolves about 0.1 mm, and a light microscope can improve this to about 0.1 μm.',t:T_L2},
+{q:'Oil should be added to a slide when viewing it with the _______ objective.',
+ o:['4 X','10 X','40 X','100 X','None of the above'],a:3,
+ n:['4× is the low-power scanning objective.','10× is the medium objective.','40× is the high-power objective, used without oil.','Correct.','d is correct.'],
+ w:'Lab 2: the four objectives are scanning (4×), medium (10×), high (40×) and <b>oil immersion (100×)</b>.',t:T_L2},
+{q:'At the end of meiosis II, each cell contains __ chromatid(s) of every chromosome.',
+ o:['1','2','4','23','46'],a:0,
+ n:['Correct.','That’s the situation after meiosis I, when each chromosome still has 2 sister chromatids.','4 chromatids make up a bivalent (a paired set of homologues) in prophase I.','23 is the number of chromosomes in a human gamete, not chromatids per chromosome.','46 is the human diploid chromosome number.'],
+ w:'Anaphase II separates the sister chromatids (Lab 4), so each of the 4 haploid cells ends up with one chromatid (now an individual chromosome) of each chromosome.',t:T_L4},
+{q:'During _______, the homologous chromosomes line up side by side, physically touching one another at which point crossing over is initiated.',
+ o:['Prophase I','Prophase II','Metaphase I','Metaphase II','Anaphase I'],a:0,
+ n:['Correct.','Homologues have already been separated by meiosis II, so they can’t pair.','In metaphase I the bivalents line up on the plate, after crossing over has already happened.','In metaphase II sister chromatids line up on the plate.','In anaphase I the homologues separate.'],
+ w:'Lab 4: in prophase I, homologous chromosomes synapse (pair along their length) to form bivalents, and crossing-over occurs. The points where chromatids exchange segments are the chiasmata.',t:T_L4},
+{q:'In most respects, _______ is identical to a normal mitotic division.',
+ o:['Meiosis II','Meiosis I','Interphase I','Interphase II','All of the above'],a:0,
+ n:['Correct.','Meiosis I pairs and separates homologous chromosomes, which never happens in mitosis.','Interphase isn’t a division at all.','Interphase isn’t a division, and the DNA isn’t replicated again before meiosis II.','Only a.'],
+ w:'Compare the Lab 4 slides: the stages of meiosis II (sister chromatids condense, attach to the spindle, align on the plate and separate) match the stages of mitosis.',t:T_L4},
+{q:'In animals, the completion of meiosis is followed soon by _______.',
+ o:['Mitosis','Fertilization','Asexual reproduction','All of the above'],a:1,
+ n:['Mitosis comes later, when the zygote divides to form the embryo.','Correct.','Gametes are for sexual reproduction.','Only b.'],
+ w:'Lab 4: the secondary oocyte is released at ovulation, and sperm penetration stimulates the second meiotic division. The haploid egg and sperm nuclei then fuse (fertilization) to give a diploid zygote.',t:T_L4},
+{q:'Turning which of the following knobs moves the objective lenses the greatest vertical distance?',
+ o:['Revolving disc','Stage clip','Coarse adjustment knob','Fine adjustment knob'],a:2,
+ n:['The revolving nosepiece rotates objectives into place. It doesn’t move them up or down.','Stage clips just hold the slide.','Correct.','The fine knob changes the distance only slightly.'],
+ w:'Lab 2: the coarse adjustment knob moves the stage up and down to focus, in large steps. The fine knob changes the specimen-to-objective distance only slightly. On your microscopes it’s the stage that moves, but the coarse knob makes the biggest change in the objective-to-specimen distance either way.',t:T_L2},
+{q:'Sexual reproduction increases genetic variability through _______.',
+ o:['Independent assortment','Crossing over','Random fertilization','All of the above'],a:3,
+ n:['True, but only one of three sources.','True, but only one of three sources.','True, but only one of three sources.','Correct.'],
+ w:'All three add variation. <b>Crossing over</b> swaps segments between homologous chromatids in prophase I (Lab 4). <b>Random fertilization</b> combines a gamete with another parent’s gamete, which gives “new genetic combinations” (Lab 4). <b>Independent assortment</b> means each homologous pair lines up and separates independently of the others in meiosis I. The slides don’t name this one.',t:T_L4+ext('Independent assortment not on the slides')},
+{q:'An organism viewed with high power objective would be magnified _______ times.',
+ o:['40X','100X','400X','1000X'],a:2,
+ n:['40× is the objective alone (or the 4× scanning objective × the 10× ocular).','100× is the medium objective (10× × 10×).','Correct.','1000× is the oil immersion objective (100× × 10×).'],
+ w:'Lab 2: total magnification = objective × ocular. The high-power objective is 40×, and the ocular usually magnifies 10×, so 40 × 10 = 400×.',t:T_L2},
+{q:'Before the beginning of actual cell division, chromosomes replicate during _______',
+ o:['Interphase','Prophase','Metaphase','Anaphase'],a:0,
+ n:['Correct.','The chromatids are already replicated by prophase. They condense then.','Sister chromatids line up on the plate.','Sister chromatids separate.'],
+ w:'Lab 4: in the S phase of interphase the DNA is duplicated, and at the end of S each chromosome consists of two sister chromatids attached at a centromere. Mitosis (from prophase on) only separates them.',t:T_L4}
+];
+
+/* ---------- II. True / False ---------- */
+var S2=[
+{q:'Binary fission of prokaryotes is an example of sexual reproduction.',a:1,
+ fix:'Binary fission is an example of <b>asexual</b> reproduction.',
+ w:'Lab 4: prokaryotes lack nuclei and don’t undergo mitosis. They replicate their chromosome and then divide in half (binary fission). There is one parent, no gametes and no fertilization, so it is asexual.',t:T_L4},
+{q:'A plasma membrane is a layer that helps in cell recognition and regulation only.',a:1,
+ fix:'The plasma membrane also <b>encloses and protects the cell</b>, separating the cytoplasm from the surroundings, and it is <b>selectively permeable</b>: it controls what enters and leaves the cell.',
+ w:'The word “only” makes this false. The membrane encloses the cytoplasm (Lab 3) and controls the passage of substances. Your dialysis tubing modeled this: water, iodine and small ions crossed, while starch and phenolphthalein couldn’t.',t:topic(3)+T_DO+T_EXT},
+{q:'Both mitosis and meiosis start with a diploid cell but the end result is haploid cells in meiosis and diploid cells in mitosis.',a:0,
+ fix:'',
+ w:'Lab 4: mitosis produces nuclei identical to the parent, so a diploid cell gives diploid cells. Meiosis reduces the chromosome number, so a diploid cell gives haploid cells (gametes). Your paper’s “True” was marked correct.',t:T_L4+T_GR},
+{q:'In onion cells, oil droplets provide a source of stored energy.',a:1,
+ fix:'Onion cells store their energy mainly as <b>sugars (simple reducing sugars)</b>, not as oil droplets.',
+ w:'In your Lab 1, onion juice turned orange with Benedict’s (a lot of reducing sugar) and stayed yellow-brown with iodine (no starch). You concluded that “onion stores carbohydrates as simple reducing sugars”. Your paper’s “True” was marked wrong.',t:T_W1+T_GR},
+{q:'If a plant cell is placed in distilled water, the cell membrane will move away from the cell wall.',a:1,
+ fix:'In distilled water (hypotonic), water enters the cell and the cell membrane is <b>pushed against</b> the cell wall. It moves away from the wall (plasmolysis) only in a <b>hypertonic</b> solution.',
+ w:'Your Exercise 5: onion cells plasmolyzed in 30% NaCl, when water left the cell and the cytoplasm shrank away from the wall. Distilled water does the opposite. The rigid wall stops the cell from bursting, so it just becomes firm.',t:T_DO},
+{q:'Meiosis II is simply a mitotic division involving the products of meiosis I, except that the sister chromatids are not genetically identical as they are in mitosis.',a:0,
+ fix:'',
+ w:'Lab 4: the stages of meiosis II match mitosis (sister chromatids align and separate). But in prophase I, crossing over exchanged segments (alleles) between chromatids, so the two sister chromatids no longer carry identical genetic material. Your paper’s “True” was marked correct.',t:T_L4+T_GR}
+];
+
+/* ---------- III. Fill in the blanks ---------- */
+var S3=[
+{t:'[0] are considered long term energy sources, while [1] are short term energy sources.',
+ f:[['lipids','lipid','fats','fat','oils','lipids fats'],['carbohydrates','carbohydrate','carbs','sugars','sugar','carbohydrates sugars']],
+ ans:['lipids','carbohydrates'],
+ w:'Lab 1: “Lipids supply more than twice as many calories per gram as do carbohydrates.” Lipids are the long-term energy store, and carbohydrates (sugars and starch) are the quick, short-term source.',tg:T_L1+T_GR},
+{t:'[0] is a green pigment found in plant cells.',
+ f:[['chlorophyll','chlorophyll a','chlorophylls','chlorophyl']],ans:['chlorophyll'],
+ w:'Chlorophyll is the pigment. The chloroplast is the organelle that contains it (Lab 3; cyanobacteria also contain chlorophyll a). The blank asks for the pigment, so “chloroplast” doesn’t fit.',tg:T_L3},
+{t:'A [0] membrane does not allow the passage of any substance.',
+ f:[['impermeable','non permeable','nonpermeable','not permeable','completely impermeable','totally impermeable']],ans:['impermeable'],
+ w:'Permeable lets substances through, selectively (differentially) permeable lets only some through (like your dialysis tubing and cell membranes), and impermeable lets nothing through.',tg:topic(5)+T_GR},
+{t:'In order to observe human cheek cells under the light microscope, the cells were stained with [0].',
+ f:[['methylene blue','methylene','methylene blue stain','methylene blue dye']],ans:['methylene blue'],
+ w:'Methylene blue is the dye from your Lab 2 wet mount. Stains increase contrast and make cells more visible, so the nucleus and cell outline of cheek (epithelial) cells show up.',tg:T_L2+T_GR},
+{t:'Osmosis is the movement of [0] across a differentially permeable membrane.',
+ f:[['water','h2o','water molecules']],ans:['water'],
+ w:'Osmosis is specifically the diffusion of <b>water</b> across a differentially (selectively) permeable membrane, like the dialysis bags in your Exercise 3.',tg:T_DO},
+{t:'Diffusion is the movement of molecules from the area of [0] concentration to the area of [1] concentration.',
+ f:[['high','higher','high solute','higher solute','greater','more','highest'],['low','lower','low solute','lower solute','less','lesser','lowest']],
+ ans:['high','low'],
+ w:'Molecules diffuse down their concentration gradient, from high to low concentration, until they are evenly spread (equilibrium). Your dye halos spread out from the spots in the same way.',tg:T_DO},
+{t:'If an animal cell is placed in a hypotonic solution, it would [0] whereas an animal cell placed in a hypertonic solution would [1].',
+ f:[['swell','swells','burst','bursts','swell and burst','swells and bursts','swell then burst','lyse','lyses','expand','expands','gain water','hemolyze'],['shrink','shrinks','shrivel','shrivels','crenate','crenates','lose water','shrink and crenate']],
+ ans:['swell (and burst)','shrink'],
+ w:'Hypotonic: water enters by osmosis, and with no cell wall the cell swells and bursts. Hypertonic: water leaves and the cell shrinks (crenates). Compare plant cells, whose wall stops them from bursting.',tg:T_DO}
+];
+
+/* ---------- IV. Matching ---------- */
+var MATCH_OPTS=[
+['A','Covered with many ribosomes that are needed for protein synthesis.'],
+['B','Receives lipids from the ER and dispatches them to other organelles.'],
+['C','Generate most of the ATP that cells use to drive reactions.'],
+['D','Contain digestive enzymes that degrade cell debris, macromolecules and particles taken from outside the cell by endocytosis.'],
+['E','Contain chlorophyll that absorbs light for photosynthesis.'],
+['F','Small vesicular compartments that contain enzymes used in various oxidation reactions.'],
+['G','Consists of cytosol and cytoplasmic organelles.'],
+['H','Allow specific molecules to diffuse into and out of the nucleus.'],
+['I','Found only in plant cells.'],
+['J','Store water and nutrients in cells.']];
+var S4=[
+['Peroxisomes',['F'],[],'Peroxisomes are small vesicles full of oxidizing enzymes. They aren’t covered on the slides.',topic(3)+T_EXT+T_GR],
+['Nuclear pores',['H'],[],'Lab 3: individual nuclear pores extend through both membranes of the nuclear envelope. They let specific molecules in and out of the nucleus.',T_L3+T_GR],
+['Chloroplast',['E'],['I'],'Lab 3: chloroplasts are the green organelles where photosynthesis occurs, and they contain chlorophyll. I (found only in plant cells) also fits, compared with animal cells, so ticking it isn’t marked wrong. Your paper’s E alone was marked correct.',T_L3+T_GR],
+['Mitochondria',['C'],[],'Lab 3: mitochondria are the site of aerobic respiration, and their cristae hold the respiratory enzymes. That’s where most of the cell’s ATP is made.',T_L3+T_GR],
+['RER',['A'],[],'The rough ER is “rough” because it is studded with ribosomes, which make proteins. (The smooth ER has none.)',topic(3)+T_EXT+T_GR],
+['Golgi apparatus',['B'],[],'The Golgi receives products from the ER, then modifies, packages and ships them to other organelles. Lab 3 names it but doesn’t explain its job.',topic(3)+T_EXT+T_GR],
+['Lysosomes',['D'],[],'Lysosomes are the digestive vesicles: their enzymes break down debris, old organelles and material brought in by endocytosis.',topic(3)+T_EXT+T_GR],
+['Cytoplasm',['G'],[],'The cytoplasm is the cytosol (the fluid) plus the organelles suspended in it, everything inside the plasma membrane except the nucleus.',topic(3)+T_GR],
+['Vacuoles',['I','J'],[],'Lab 3: the large central vacuole of a plant cell is mostly water and stores organic and inorganic molecules, ions, water, enzymes and wastes (J). It is the plant-cell feature (I). Your paper’s “I, J” was marked correct.',T_L3+T_GR]
+];
+
+/* ---------- V. Short answers ---------- */
+var REL=['Proportional','Inversely proportional'];
+var S5=[
+{id:'sA',label:'A',pts:3,kind:'open',q:'State the criteria of the cell theory.',
+ m:'<ol><li>All living organisms are made of <b>one or more cells</b>.</li><li>The cell is the <b>basic (smallest) unit of structure and function</b> of life.</li><li>All cells come from <b>pre-existing cells</b>.</li></ol><p>1 pt each.</p>',t:topic(3)+T_EXT+T_GR},
+{id:'sB',label:'B',pts:1.5,kind:'order',
+ q:'Arrange the following terms (just write the letters) according to the correct path of light:<div class="tw" style="margin:8px 0 0"><table style="min-width:0;width:auto"><tr><td><b>a.</b> Diaphragm</td><td><b>b.</b> Ocular lens</td><td><b>c.</b> Illuminator</td><td><b>d.</b> Objective</td></tr><tr><td><b>e.</b> Specimen</td><td><b>f.</b> Prism</td><td><b>g.</b> Condenser</td><td></td></tr></table></div>',
+ letters:['a','b','c','d','e','f','g'],accepted:[['c','a','g','e','d','f','b'],['c','g','a','e','d','f','b']],show:'c → a → g → e → d → f → b',
+ w:'Follow the light up the microscope (Lab 2): the <b>illuminator</b> (c) makes the light, the <b>iris diaphragm</b> (a) regulates how much passes, the <b>condenser</b> (g) focuses it onto the <b>specimen</b> (e), the <b>objective</b> (d) forms the image, the <b>prism</b> (f) in the body tube redirects the light to the oculars, and the <b>ocular</b> (b) is the lens you look through.<p>The iris diaphragm is built into the bottom of the condenser, so light passes it just before the condenser lens. The two sit together as one unit under the stage, so the order c, g, a… is also accepted here. Your paper left out the diaphragm.</p>',t:T_L2},
+{id:'sC',label:'C',pts:2,kind:'auto',q:'State the relationship between the following, by writing either “Proportional” or “Inversely proportional”.',
+ fields:[{lab:'a. Working distance and magnification',type:'select',opts:REL,ans:'Inversely proportional',p:0.5},
+  {lab:'b. Field of view and depth of field',type:'select',opts:REL,ans:'Proportional',p:0.5},
+  {lab:'c. Depth of field and magnification',type:'select',opts:REL,ans:'Inversely proportional',p:0.5},
+  {lab:'d. Numerical aperture and resolving power',type:'select',opts:REL,ans:'Proportional',p:0.5}],
+ w:'As magnification goes up, the working distance goes down (Lab 2, Question 3), you see a smaller field of view, and fewer threads stay in focus, so the depth of field goes down too (Exercise 2).<ul><li><b>a</b> and <b>c</b>: these go down while magnification goes up, so they’re inversely proportional.</li><li><b>b</b>: field of view and depth of field shrink <i>together</i>, so they’re proportional. Your paper had b and c the wrong way round, and both were marked wrong.</li><li><b>d</b>: numerical aperture measures how much light a lens gathers. The higher it is, the finer the detail the lens can resolve, so they’re proportional. Numerical aperture isn’t on the slides.</li></ul>',t:T_L2+ext('Numerical aperture not on the slides')+T_GR},
+{id:'sD',label:'D',pts:2,kind:'auto',
+ q:'We placed Red Blood Cells in a solution composed of row 1 percentages of NaCl. Fill out the following table. <span style="color:var(--muted);font-size:.85rem">(Grey italic cells were printed on the exam. Type percentages as numbers, e.g. 0.5.)</span>',
+ table:{head:['% NaCl solution','Effect on RBC (bursts, nothing, shrinks)','Type of solution'],
+  rows:[['<span class="given">0%</span>','{0}','{1}'],['{2}','<span class="given">Nothing</span>','{3}'],['{4}','{5}','<span class="given">hypotonic</span>'],['{6}','<span class="given">Shrink</span>','{7}']]},
+ fields:[{lab:'Row 1 effect',type:'select',opts:['Bursts','Nothing','Shrinks'],ans:'Bursts',p:0.25},
+  {lab:'Row 1 type',type:'select',opts:['Hypotonic','Isotonic','Hypertonic'],ans:'Hypotonic',p:0.25},
+  {lab:'Row 2 %',type:'range',min:0.9,max:0.9,show:'0.9',p:0.25},
+  {lab:'Row 2 type',type:'select',opts:['Hypotonic','Isotonic','Hypertonic'],ans:'Isotonic',p:0.25},
+  {lab:'Row 3 %',type:'range',min:0,max:0.9,maxEx:1,show:'any value below 0.9 (e.g. 0 or 0.5)',p:0.25},
+  {lab:'Row 3 effect',type:'select',opts:['Bursts','Nothing','Shrinks'],ans:'Bursts',p:0.25},
+  {lab:'Row 4 %',type:'range',min:0.9,max:100,minEx:1,show:'any value above 0.9 (e.g. 2, 5 or 10)',p:0.25},
+  {lab:'Row 4 type',type:'select',opts:['Hypotonic','Isotonic','Hypertonic'],ans:'Hypertonic',p:0.25}],
+ w:'Red blood cells are isotonic with <b>0.9% NaCl</b>: nothing happens to them. Below 0.9% the solution is <b>hypotonic</b>, so water enters and the cells, which have no wall, <b>burst</b>. Above 0.9% it is <b>hypertonic</b>, so water leaves and they <b>shrink</b>. Rows 3 and 4 accept any value on the correct side of 0.9%. Your paper’s row 4 (two numbers written over each other) was marked wrong. On the exam, write one clear value.',t:T_DO+T_GR},
+{id:'sE',label:'E',pts:2,kind:'open',q:'If a grocer wanted to keep his vegetables fresh and crispy, which type of water would he spray on them and why: distilled water, salt water, or no water at all? Explain!',
+ m:'<p><b>Distilled (fresh) water.</b> It is hypotonic to the vegetable cells, so water moves <b>into</b> the cells by osmosis. The vacuoles fill and push the cell membrane against the cell wall, which keeps the vegetables firm and crisp.</p><p>Salt water is hypertonic: water would leave the cells and they would wilt (plasmolysis, like your onion cells in 30% NaCl). With no water at all, the vegetables keep losing water and wilt.</p>',t:T_DO+T_GR},
+{id:'sF',label:'F',pts:2,kind:'open',q:'What factors affect the direction of diffusion? If diffusion is observed to stop, does this mean that the molecules have stopped moving? Why or why not?',
+ m:'<p><b>Direction:</b> the <b>concentration gradient</b>. Molecules move from where they are more concentrated to where they are less concentrated, so the relative concentrations on each side decide the direction. (Temperature and molecular weight change the <i>rate</i>, not the direction: your smallest dye, potassium permanganate, spread fastest.)</p><p><b>No, they don’t stop.</b> When diffusion appears to stop, the system is at equilibrium. As long as there is heat, the molecules have kinetic energy and keep moving, but equally in both directions, so there is no <b>net</b> movement. (Your worksheet, Exercise 1c.)</p>',t:T_DO},
+{id:'sG',label:'G',pts:2,kind:'open',q:'In our lab, we used dialysis bags. What do these bags represent? Why are these structures considered so important to the cell?',
+ m:'<p>The dialysis bags represent the <b>cell (plasma) membrane</b>, because they are <b>selectively (differentially) permeable</b>. In your Exercise 2, water, iodine, Na⁺ and OH⁻ crossed the tubing, but large starch and phenolphthalein molecules couldn’t. So it isn’t “water only”: small particles pass, large ones don’t.</p><p>The membrane is important because it <b>controls what enters and leaves the cell</b>. It lets water, nutrients and small molecules in and out while keeping large molecules inside, so the cell can keep its internal environment different from the outside.</p>',t:T_DO}
+];
+
+/* ---------- VI. Problems ---------- */
+var BEN=['− Blue','+ Green / orange / brick red'];
+var LUG=['− Yellow-brown','+ Blue-black'];
+var SUD=['− 2 layers','+ 1 red layer'];
+var BIU=['− Blue','+ Violet'];
+function rowFields(prefix,ans){
+  var sets=[BEN,LUG,SUD,BIU], names=['Benedict’s','Lugol’s','Sudan III','Biuret'];
+  return ans.map(function(v,i){return {lab:prefix+' · '+names[i],type:'select',opts:sets[i],ans:sets[i][v],p:0.25};});
+}
+var CMP=['Reducing sugar','Starch','Lipid','Protein'];
+var S6=[
+{intro:'<h3>Problem A</h3><p>Consider the following tables. (8 pts) <span style="color:var(--muted);font-size:.9rem">The exam says Sudan III. It works like the Sudan IV test in your Lab 1 slides: a lipid gives one red layer (a homogeneous mixture), and no lipid gives 2 layers.</span></p>'},
+{id:'pA1',label:'1',kind:'auto',q:'Fill the table (4 pts; 0.25 each). Choose + or − for each test.',
+ table:{head:['Tube','Content','Benedict’s','Lugol’s','Sudan III','Biuret'],
+  rows:[['1','Fruit sugar','{0}','{1}','{2}','{3}'],['2','Olive oil','{4}','{5}','{6}','{7}'],['3','Milk','{8}','{9}','{10}','{11}'],['4','Potato','{12}','{13}','{14}','{15}']]},
+ fields:[].concat(rowFields('Fruit sugar',[1,0,0,0]),rowFields('Olive oil',[0,0,1,0]),rowFields('Milk',[1,0,1,1]),rowFields('Potato',[0,1,0,0])),
+ w:'<ul><li><b>Fruit sugar (fructose):</b> fructose is a reducing sugar (Lab 1), so Benedict’s is <b>+</b>. Everything else is −.</li><li><b>Olive oil:</b> only Sudan is <b>+</b>: one red layer, because the dye dissolves in the lipid. Your paper’s “+ 2 layers” was marked wrong. Two layers means negative.</li><li><b>Milk:</b> lactose is a reducing disaccharide (Benedict’s <b>+</b>), milk fat makes Sudan <b>+</b>, and milk proteins make Biuret <b>+</b> (violet). There’s no starch, so Lugol’s is −. Your paper’s milk Sudan and Biuret answers were marked wrong.</li><li><b>Potato:</b> stores starch, so Lugol’s is <b>+</b> (blue-black). Benedict’s counts as − (blue). Your Lab 1 potato juice gave only a greenish blue.</li></ul>',t:T_L1+T_W1+T_GR},
+{id:'pA2',label:'2',kind:'auto',q:'State the organic compound(s) found in each tube (1 pt; 0.25 each). Tick everything present.',
+ fields:[{lab:'Tube 1: Fruit sugar',type:'multi',opts:CMP,req:['Reducing sugar'],p:0.25},
+  {lab:'Tube 2: Olive oil',type:'multi',opts:CMP,req:['Lipid'],p:0.25},
+  {lab:'Tube 3: Milk',type:'multi',opts:CMP,req:['Reducing sugar','Lipid','Protein'],p:0.25},
+  {lab:'Tube 4: Potato',type:'multi',opts:CMP,req:['Starch'],p:0.25}],
+ w:'Read the + results across each row. Tube 1: <b>fructose</b>, a monosaccharide (reducing sugar). Tube 2: <b>lipids</b>. Tube 3: <b>lactose</b> (a reducing sugar), <b>lipids</b> and <b>proteins</b>. The grader added “prot” to your milk answer. Tube 4: <b>starch</b>, a polysaccharide. On the exam, name the specific molecule where you can (fructose, lactose, starch).',t:T_L1+T_GR},
+{intro:'<div class="tw"><table><tr><th>Tube</th><th>Content</th><th>Benedict’s</th><th>Lugol’s</th><th>Sudan III</th><th>Biuret</th></tr><tr><td>1</td><td>X</td><td>Blue</td><td>Dark brown</td><td>2 layers</td><td>Blue</td></tr><tr><td>2</td><td>Y</td><td>Brick red</td><td>Dark brown</td><td>2 layers</td><td>Violet</td></tr><tr><td>3</td><td>Z</td><td>Blue</td><td>Dark brown</td><td>2 layers</td><td>Blue</td></tr><tr><td>4</td><td>Pizza</td><td>?</td><td>?</td><td>?</td><td>?</td></tr></table></div>'},
+{id:'pA3',label:'3',kind:'auto',q:'Fill the pizza row of the table above (1 pt; 0.25 each).',
+ fields:rowFields('Pizza',[1,1,1,1]),
+ w:'Pizza is a mixture, so all four tests are <b>+</b>:<ul><li>the dough is mostly starch: Lugol’s turns blue-black;</li><li>the dough and tomato sauce contain reducing sugars: Benedict’s turns green, orange or brick red (your paper’s “Blue” was marked wrong);</li><li>cheese and oil are lipids: Sudan gives one red layer (your paper’s “red” alone was marked wrong, so write the layers);</li><li>cheese (and any meat) contains protein: Biuret turns violet.</li></ul>',t:T_L1+T_GR},
+{id:'pA4',label:'4',pts:0.75,kind:'open',q:'State the organic compound(s) found in tube 4 (pizza).',
+ m:'<p><b>Carbohydrates</b> (starch, plus reducing sugars), <b>lipids</b> and <b>proteins</b>. That’s three groups of organic compounds, 0.25 each. Your paper’s “starch, lipids, proteins” was ticked.</p>',t:T_L1+T_GR},
+{id:'pA5',label:'5',pts:0.25,kind:'open',q:'In all the experiments done in the bio 201 lab, a negative control should be used. Explain why.',
+ m:'<p>A negative control contains <b>only the solvent</b> (usually distilled water), none of the substance being tested for. It shows <b>what a negative result looks like</b>, so you can compare the unknowns with it and know the reagents and glassware aren’t giving a false positive (Lab 1).</p><p>Your paper’s “to show the colour of a non-reacted product” was marked wrong. Say what it <i>contains</i> (no tested substance) and what it <i>shows</i> (a negative result).</p>',t:T_L1+T_GR},
+{id:'pA6',label:'6',pts:1,kind:'open',q:'What does it mean if the tube containing distilled water gives a violet color when tested for the Biuret test? What will you do?',
+ m:'<p>The negative control gave a positive result, so the water or the tube is <b>contaminated with protein</b> (peptide bonds), and the results can’t be trusted. <b>Repeat the test</b> with clean tubes and fresh distilled water.</p>',t:T_L1+T_GR},
+
+{intro:'<h3>Problem D</h3><p>Suppose that you have a diffusion/osmosis apparatus similar to the one in the figure below. Side A contains 100 mL of distilled water and iodine, while side B contains a 10% starch solution. The liquid levels in both sides are initially the same. Answer the following questions in complete sentences. (6 pts)</p><figure>'+utubeSVG()+'<figcaption>Redrawn from the exam.</figcaption></figure><p style="color:var(--muted);font-size:.9rem">Treat the membrane like your dialysis tubing: water and iodine can cross it, starch can’t.</p>'},
+{id:'pD1',label:'1',kind:'auto',q:'What will happen to the level of the water and iodine solution (Side A)?',
+ fields:[{lab:'Level of side A',type:'select',opts:['It rises','It falls','It stays the same'],ans:'It falls',p:1}],
+ w:'It <b>falls</b> (and side B rises). Water leaves side A for side B; question 2 explains why.',t:T_DO},
+{id:'pD2',label:'2',pts:1,kind:'open',q:'Explain why this will occur.',
+ m:'<p>Side B contains 10% starch, so it has a <b>lower water concentration</b> (it is hypertonic to side A). Starch is too large to cross the membrane, but water can, so water moves by <b>osmosis</b> from side A (higher water concentration) to side B.</p>',t:T_DO},
+{id:'pD3',label:'3',pts:2,kind:'open',q:'What will happen to the color of the water and iodine solution? Why?',
+ m:'<p>It <b>stays yellowish-brown</b>, the iodine color, and does <b>not</b> turn blue-black. It may get a little paler as iodine moves into side B. Starch molecules are too large to cross the membrane, so there is no starch on side A for the iodine to react with. In your Exercise 2, the iodine solution outside the starch bag stayed brown in the same way.</p>',t:T_DO+T_L1},
+{id:'pD4',label:'4',pts:2,kind:'open',q:'What will happen to the color of the starch solution? Why?',
+ m:'<p>It turns <b>blue-black</b>. Iodine is small, so it diffuses through the membrane into side B, where it meets the starch. Starch is a coiled polymer of glucose, and iodine interacts with the coil to give the bluish-black color (Lab 1, iodine test).</p>',t:T_L1+T_DO},
+
+{intro:'<h3>Problem H</h3><p>A laboratory assistant prepared solutions of different concentrations of sucrose: 0.8 M, 0.6 M, 0.4 M and 0.2 M. Unfortunately, she forgot to label them. After realizing the error, the assistant randomly labeled the beakers containing these four unknown solutions as A, B, C and D. Based on the principles of diffusion and osmosis, design an experiment that the assistant could use to identify each of the unknown solutions. (8 pts)</p><p><b>Materials available:</b> balance, tissue paper, potato (0.6 M), knife, beakers, 4 solutions (0.8 M, 0.6 M, 0.4 M, 0.2 M).</p>'},
+{id:'pH1',label:'1',pts:2,kind:'open',q:'Describe how you would set up and perform the experiment (procedure).',
+ m:'<ol><li>Pour each unknown into its own beaker, keeping the labels A, B, C and D.</li><li>With the knife, cut 4 potato cylinders of about the same size.</li><li>Blot each cylinder with tissue paper and weigh it on the balance (initial mass).</li><li>Place one cylinder in each beaker and leave them for the same time (about 30 min, as in your Procedure 9.6).</li><li>Remove the cylinders, blot them dry with tissue paper and weigh them again (final mass).</li><li>Calculate the change: final mass − initial mass.</li></ol>',t:T_DO},
+{id:'pH2',label:'2',kind:'auto',q:'The results you would expect to obtain. For each solution, predict what happens to the potato’s mass.',
+ fields:[{lab:'In 0.8 M',type:'select',opts:['Loses mass','No significant change','Gains a little mass','Gains the most mass'],ans:'Loses mass',p:0.5},
+  {lab:'In 0.6 M',type:'select',opts:['Loses mass','No significant change','Gains a little mass','Gains the most mass'],ans:'No significant change',p:0.5},
+  {lab:'In 0.4 M',type:'select',opts:['Loses mass','No significant change','Gains a little mass','Gains the most mass'],ans:'Gains a little mass',p:0.5},
+  {lab:'In 0.2 M',type:'select',opts:['Loses mass','No significant change','Gains a little mass','Gains the most mass'],ans:'Gains the most mass',p:0.5}],
+ w:'The potato is 0.6 M. 0.8 M is hypertonic to it, so water leaves and it <b>loses mass</b>. 0.6 M is isotonic: <b>no significant change</b>. 0.4 M and 0.2 M are hypotonic, so water enters, and the bigger the concentration difference, the bigger the gain, so 0.2 M gives the <b>most</b>. Your potato cylinders behaved the same way: they lost mass in 30% salt and gained mass in 0%.',t:T_DO},
+{id:'pH3',label:'3',pts:4,kind:'open',q:'Explain how the assistant could use those results to identify her solutions (conclusion).',
+ m:'<p>Water moves by osmosis from the solution with the lower solute concentration to the one with the higher solute concentration, and the larger the difference, the larger the mass change. So:</p><ul><li>the beaker where the potato <b>lost mass</b> is <b>0.8 M</b> (hypertonic to the potato);</li><li>the beaker where the mass <b>stayed about the same</b> is <b>0.6 M</b> (isotonic, the same as the potato);</li><li>the beaker with a <b>small gain</b> is <b>0.4 M</b> (hypotonic);</li><li>the beaker with the <b>largest gain</b> is <b>0.2 M</b> (the most hypotonic).</li></ul><p>Ranking the four mass changes from most loss to most gain gives the concentrations from highest to lowest.</p>',t:T_DO}
+];
+
+/* ---------- state ---------- */
+var KEY='bio201b-midterm-f2019-labs1-5-v1';
+var st={a:{},c:{},s:{}};
+try{var raw=localStorage.getItem(KEY); if(raw){var p=JSON.parse(raw); if(p&&p.a) st=p;}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
+
+var items=[];
+
+function norm(s){
+  return String(s||'').toLowerCase().replace(/[’']/g,'').replace(/[^a-z0-9.,+ \-]/g,' ').replace(/-/g,' ').replace(/\s+/g,' ').trim()
+    .replace(/^(the|a|an) /,'').replace(/ test$/,'').replace(/[.,]+$/,'').trim();
+}
+function inList(v,list){var n=norm(v); if(!n) return false; for(var i=0;i<list.length;i++){if(norm(list[i])===n) return true;} return false;}
+function numVal(v){var s=String(v==null?'':v).replace(',','.').replace(/[^0-9.\-]/g,''); if(s===''||s==='.'||s==='-'||isNaN(parseFloat(s))) return null; return parseFloat(s);}
+function inRange(v,f){var x=numVal(v); if(x===null) return false; var lo=f.minEx?x>f.min:x>=f.min-1e-9; var hi=f.maxEx?x<f.max:x<=f.max+1e-9; return lo&&hi;}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function fmt(n){return (Math.round(n*100)/100).toString();}
+function el(tag,cls,html){var e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e;}
+
+function card(num,pts,qhtml){
+  var c=el('div','card');
+  c.innerHTML='<div class="qhead"><span class="qnum">'+num+'</span><div class="qtext">'+qhtml+'</div><span class="pts">'+fmt(pts)+' pt'+(pts==1?'':'s')+'</span></div>';
+  return c;
+}
+function feedback(c){var f=el('div','fb'); c.appendChild(f); return f;}
+function verdict(earned,pts){
+  if(earned>=pts-1e-9) return '<div class="verdict ok">Correct · '+fmt(earned)+' / '+fmt(pts)+'</div>';
+  if(earned>0) return '<div class="verdict part">Partly right · '+fmt(earned)+' / '+fmt(pts)+'</div>';
+  return '<div class="verdict bad">Not quite · 0 / '+fmt(pts)+'</div>';
+}
+function setState(c,earned,pts){c.dataset.state = earned>=pts-1e-9?'right':(earned>0?'partial':'wrong');}
+function register(it){items.push(it);}
+
+/* MCQ (with a note for every option) */
+function buildMCQ(host,id,num,d,pts){
+  var c=card(num,pts,d.q);
+  var ul=el('div','opts');
+  var labels=[];
+  d.o.forEach(function(o,i){
+    var lab=el('label','opt');
+    lab.innerHTML='<input type="radio" name="'+id+'" value="'+i+'"><span class="L">'+L[i]+'.</span><span class="otext">'+o+(d.n&&d.n[i]?'<span class="onote">'+d.n[i]+'</span>':'')+'</span>';
+    var inp=lab.querySelector('input');
+    if(st.a[id]===i) inp.checked=true;
+    inp.addEventListener('change',function(){st.a[id]=i; save(); if(st.c[id]){st.c[id]=0; clear(); save(); updateScore();}});
+    ul.appendChild(lab); labels.push(lab);
+  });
+  c.appendChild(ul);
+  var act=el('div','actions'); var b=el('button',null,'Check'); act.appendChild(b); c.appendChild(act);
+  var fb=feedback(c);
+  function earned(){return st.a[id]===d.a?pts:0;}
+  function check(){
+    st.c[id]=1; save();
+    c.classList.add('checked');
+    labels.forEach(function(l,i){l.classList.toggle('is-correct',i===d.a); l.classList.toggle('is-wrong',i===st.a[id]&&i!==d.a);});
+    var e=earned();
+    var head = st.a[id]==null ? '<div class="verdict bad">No answer · the answer is '+L[d.a]+'</div>' : (e? '<div class="verdict ok">Correct · '+L[d.a]+'</div>' : '<div class="verdict bad">Not quite · the answer is '+L[d.a]+'</div>');
+    fb.innerHTML=head+'<p>'+d.w+'</p><div class="tags">'+d.t+'</div>'; fb.classList.add('show');
+    setState(c,e,pts); updateScore();
+  }
+  function clear(){c.classList.remove('checked'); labels.forEach(function(l){l.classList.remove('is-correct','is-wrong');}); fb.classList.remove('show'); delete c.dataset.state;}
+  b.addEventListener('click',check);
+  host.appendChild(c);
+  register({id:id,pts:pts,check:check,isChecked:function(){return !!st.c[id];},earned:earned,pending:function(){return false;},reset:function(){clear(); labels.forEach(function(l){l.querySelector('input').checked=false;});}});
+}
+
+/* True / False with a correction box */
+function buildTF(host,id,num,d){
+  var pts=0.5;
+  var c=card(num,pts,d.q);
+  var ul=el('div','opts tf'); var labels=[];
+  ['True','False'].forEach(function(o,i){
+    var lab=el('label','opt');
+    lab.innerHTML='<input type="radio" name="'+id+'" value="'+i+'"><span class="otext">'+o+'</span>';
+    var inp=lab.querySelector('input');
+    if(st.a[id]===i) inp.checked=true;
+    inp.addEventListener('change',function(){st.a[id]=i; save(); if(st.c[id]){st.c[id]=0; clear(); save(); updateScore();}});
+    ul.appendChild(lab); labels.push(lab);
+  });
+  c.appendChild(ul);
+  var wrap=el('div','tfcorr','<label for="'+id+'_c">If false, write the correction:</label>');
+  var ta=el('textarea','small'); ta.id=id+'_c'; ta.placeholder='Your correction (not graded automatically)';
+  if(st.a[id+'_c']) ta.value=st.a[id+'_c'];
+  ta.addEventListener('input',function(){st.a[id+'_c']=ta.value; save();});
+  wrap.appendChild(ta); c.appendChild(wrap);
+  var act=el('div','actions'); var b=el('button',null,'Check'); act.appendChild(b); c.appendChild(act);
+  var fb=feedback(c);
+  function earned(){return st.a[id]===d.a?pts:0;}
+  function check(){
+    st.c[id]=1; save();
+    labels.forEach(function(l,i){l.classList.toggle('is-correct',i===d.a); l.classList.toggle('is-wrong',i===st.a[id]&&i!==d.a);});
+    var e=earned(); var ans=d.a===0?'TRUE':'FALSE';
+    var head = st.a[id]==null ? '<div class="verdict bad">No answer · it is '+ans+'</div>' : (e? '<div class="verdict ok">Correct · '+ans+'</div>' : '<div class="verdict bad">Not quite · it is '+ans+'</div>');
+    fb.innerHTML=head+(d.fix?'<p class="model"><b>Correction:</b> '+d.fix+'</p>':'')+'<p>'+d.w+'</p><div class="tags">'+d.t+'</div>'; fb.classList.add('show');
+    setState(c,e,pts); updateScore();
+  }
+  function clear(){labels.forEach(function(l){l.classList.remove('is-correct','is-wrong');}); fb.classList.remove('show'); delete c.dataset.state;}
+  b.addEventListener('click',check);
+  host.appendChild(c);
+  register({id:id,pts:pts,check:check,isChecked:function(){return !!st.c[id];},earned:earned,pending:function(){return false;},reset:function(){clear(); ta.value=''; labels.forEach(function(l){l.querySelector('input').checked=false;});}});
+}
+
+/* Auto-graded fields: text, select, range, multi; layouts: inline / grid / table */
+function makeInput(f,id,i){
+  var inp;
+  if(f.type==='select'){
+    inp=el('select'); inp.innerHTML='<option value="">Choose…</option>'+f.opts.map(function(o){return '<option>'+esc(o)+'</option>';}).join('');
+  } else if(f.type==='multi'){
+    inp=el('div','chips'); inp.setAttribute('role','group');
+    f.opts.forEach(function(o){
+      var ch=el('label','chip'); ch.innerHTML='<input type="checkbox" value="'+esc(o)+'"><span>'+esc(o)+'</span>'; inp.appendChild(ch);
+    });
+  } else {
+    inp=el('input'); inp.type='text'; inp.autocomplete='off'; inp.spellcheck=false; inp.className='blank'+(f.short||f.type==='range'?' short':'');
+    if(f.type==='range'){ inp.inputMode='decimal'; inp.placeholder='%'; }
+  }
+  inp.setAttribute('aria-label',f.lab||('Blank '+(i+1)));
+  return inp;
+}
+function getVal(inp,f){
+  if(f.type==='multi'){var r=[]; inp.querySelectorAll('input').forEach(function(x){if(x.checked) r.push(x.value);}); return r;}
+  return inp.value;
+}
+function setVal(inp,f,v){
+  if(f.type==='multi'){inp.querySelectorAll('input').forEach(function(x){x.checked = v? v.indexOf(x.value)>=0 : false;}); return;}
+  inp.value = v==null? '' : v;
+}
+function fieldOK(f,v,opt,i){
+  if(f.type==='select') return v===f.ans;
+  if(f.type==='range') return inRange(v,f);
+  if(f.type==='multi'){
+    v=v||[]; var allowed=f.req.concat(f.opt||[]);
+    for(var k=0;k<f.req.length;k++){ if(v.indexOf(f.req[k])<0) return false; }
+    for(var j=0;j<v.length;j++){ if(allowed.indexOf(v[j])<0) return false; }
+    return true;
+  }
+  return inList(v,f.acc);
+}
+function showAns(f,opt,i){
+  if(f.show) return f.show;
+  if(f.type==='select') return f.ans;
+  if(f.type==='multi') return f.req.join(', ')+(f.opt&&f.opt.length?' (optional: '+f.opt.join(', ')+')':'');
+  return opt.ans? opt.ans[i] : f.acc[0];
+}
+function buildAuto(host,id,num,qhtml,fields,opt){
+  var pts=fields.reduce(function(s,f){return s+f.p;},0);
+  var c=card(num,pts,qhtml);
+  var vals=st.a[id]||[];
+  var inputs=[], fixes=[];
+  fields.forEach(function(f,i){inputs[i]=makeInput(f,id,i); fixes[i]=el('span','fix');});
+  if(opt.inline){
+    var html=opt.inline.replace(/\[(\d+)\]/g,function(m,i){return '<span data-slot="'+i+'"></span>';});
+    var line=el('div','fill-line',html);
+    c.querySelector('.qtext').innerHTML=''; c.querySelector('.qtext').appendChild(line);
+    fields.forEach(function(f,i){var s=line.querySelector('[data-slot="'+i+'"]'); s.appendChild(inputs[i]); s.appendChild(fixes[i]);});
+  } else if(opt.table){
+    var tb='<div class="tw"><table class="qtable"><tr>'+opt.table.head.map(function(h){return '<th>'+h+'</th>';}).join('')+'</tr>'+
+      opt.table.rows.map(function(r){return '<tr>'+r.map(function(cell){return '<td>'+String(cell).replace(/\{(\d+)\}/g,function(m,i){return '<span data-slot="'+i+'"></span>';})+'</td>';}).join('')+'</tr>';}).join('')+'</table></div>';
+    var tw=el('div',null,tb); c.appendChild(tw);
+    fields.forEach(function(f,i){var s=tw.querySelector('[data-slot="'+i+'"]'); s.appendChild(inputs[i]); s.appendChild(el('br')); s.appendChild(fixes[i]);});
+  } else {
+    var g=el('div','grid');
+    fields.forEach(function(f,i){
+      var cell=el('div'); cell.appendChild(inputs[i]); cell.appendChild(fixes[i]);
+      if(f.type==='multi'){ var wm=el('div'); wm.style.gridColumn='1 / -1'; wm.appendChild(el('div','lab',f.lab)); wm.lastChild.style.marginBottom='4px'; wm.appendChild(cell); g.appendChild(wm); }
+      else { g.appendChild(el('div','lab',f.lab)); g.appendChild(cell); }
+    });
+    c.appendChild(g);
+  }
+  inputs.forEach(function(inp,i){
+    var f=fields[i];
+    if(vals[i]!=null) setVal(inp,f,vals[i]);
+    var ev=(f.type==='select'||f.type==='multi')?'change':'input';
+    inp.addEventListener(ev,function(){var v=st.a[id]||[]; v[i]=getVal(inp,f); st.a[id]=v; save(); if(st.c[id]){st.c[id]=0; clear(); save(); updateScore();}});
+    if(inp.tagName==='INPUT') inp.addEventListener('keydown',function(e){if(e.key==='Enter') check();});
+  });
+  var act=el('div','actions'); var b=el('button',null,'Check'); act.appendChild(b); c.appendChild(act);
+  var fb=feedback(c);
+  function results(){var v=st.a[id]||[]; return fields.map(function(f,i){return fieldOK(f,v[i],opt,i);});}
+  function earned(){var r=results(),s=0; fields.forEach(function(f,i){if(r[i]) s+=f.p;}); return s;}
+  function check(){
+    st.c[id]=1; save();
+    var r=results();
+    inputs.forEach(function(inp,i){
+      var f=fields[i];
+      inp.classList.toggle('ok',r[i]); inp.classList.toggle('bad',!r[i]);
+      if(f.type==='multi'){ inp.querySelectorAll('.chip').forEach(function(ch){var v=ch.querySelector('input').value; ch.classList.toggle('need',!r[i] && f.req.indexOf(v)>=0);}); }
+      fixes[i].textContent = r[i]? '' : '→ '+showAns(f,opt,i);
+    });
+    var e=earned();
+    fb.innerHTML=verdict(e,pts)+'<p>'+opt.w+'</p><div class="tags">'+opt.t+'</div>'; fb.classList.add('show');
+    setState(c,e,pts); updateScore();
+  }
+  function clear(){inputs.forEach(function(inp,i){inp.classList.remove('ok','bad'); fixes[i].textContent=''; if(inp.querySelectorAll) inp.querySelectorAll('.chip').forEach(function(ch){ch.classList.remove('need');});}); fb.classList.remove('show'); delete c.dataset.state;}
+  b.addEventListener('click',check);
+  host.appendChild(c);
+  register({id:id,pts:pts,check:check,isChecked:function(){return !!st.c[id];},earned:earned,pending:function(){return false;},reset:function(){clear(); inputs.forEach(function(inp,i){setVal(inp,fields[i],null);});}});
+}
+
+/* Ordering (path of light) */
+function buildOrder(host,d){
+  var id=d.id, pts=d.pts, n=d.letters.length;
+  var c=card(d.label,pts,d.q);
+  var row=el('div','fill-line'); var sels=[], fixes=[];
+  for(var i=0;i<n;i++){
+    var s=el('select'); s.setAttribute('aria-label','Position '+(i+1));
+    s.innerHTML='<option value="">'+(i+1)+'…</option>'+d.letters.map(function(x){return '<option>'+x+'</option>';}).join('');
+    row.appendChild(s); if(i<n-1) row.appendChild(el('span',null,' → '));
+    sels.push(s);
+  }
+  c.appendChild(row);
+  var fix=el('p','fix'); fix.style.margin='6px 0 0'; c.appendChild(fix);
+  var vals=st.a[id]||[];
+  sels.forEach(function(s,i){ if(vals[i]) s.value=vals[i]; s.addEventListener('change',function(){var v=st.a[id]||[]; v[i]=s.value; st.a[id]=v; save(); if(st.c[id]){st.c[id]=0; clear(); save(); updateScore();}}); });
+  var act=el('div','actions'); var b=el('button',null,'Check'); act.appendChild(b); c.appendChild(act);
+  var fb=feedback(c);
+  function best(){
+    var v=st.a[id]||[]; var top=null, hits=-1;
+    d.accepted.forEach(function(acc){var h=0; for(var i=0;i<n;i++){if(v[i]===acc[i]) h++;} if(h>hits){hits=h; top=acc;}});
+    return {acc:top,hits:hits};
+  }
+  function earned(){var bb=best(); if(bb.hits===n) return pts; return Math.floor(pts*bb.hits/n*4)/4;}
+  function check(){
+    st.c[id]=1; save();
+    var bb=best(), v=st.a[id]||[];
+    sels.forEach(function(s,i){var ok=v[i]===bb.acc[i]; s.classList.toggle('ok',ok); s.classList.toggle('bad',!ok);});
+    fix.textContent = bb.hits===n? '' : 'Answer: '+d.show;
+    var e=earned();
+    fb.innerHTML=verdict(e,pts)+'<p>'+d.w+'</p><div class="tags">'+d.t+'</div>'; fb.classList.add('show');
+    setState(c,e,pts); updateScore();
+  }
+  function clear(){sels.forEach(function(s){s.classList.remove('ok','bad');}); fix.textContent=''; fb.classList.remove('show'); delete c.dataset.state;}
+  b.addEventListener('click',check);
+  host.appendChild(c);
+  register({id:id,pts:pts,check:check,isChecked:function(){return !!st.c[id];},earned:earned,pending:function(){return false;},reset:function(){clear(); sels.forEach(function(s){s.value='';});}});
+}
+
+/* Open / self-graded */
+function buildOpen(host,d){
+  var id=d.id, pts=d.pts;
+  var c=card(d.label,pts,d.q);
+  var ta=el('textarea'); ta.placeholder='Write your answer here, then show the model answer.'; ta.setAttribute('aria-label','Your answer');
+  if(st.a[id]) ta.value=st.a[id];
+  ta.addEventListener('input',function(){st.a[id]=ta.value; save();});
+  c.appendChild(ta);
+  var act=el('div','actions'); var b=el('button',null,'Show model answer'); act.appendChild(b); c.appendChild(act);
+  var fb=feedback(c);
+  function render(){
+    var sv=st.s[id];
+    var btns=[['Full',pts],['Half',pts/2],['None',0]].map(function(x){return '<button data-v="'+x[1]+'" class="'+(sv===x[1]?'on':'')+'">'+x[0]+' ('+fmt(x[1])+')</button>';}).join('');
+    fb.innerHTML='<div class="verdict">Model answer</div><div class="model">'+d.m+'</div><div class="tags">'+d.t+'</div><div class="self"><span>Mark yourself:</span>'+btns+'</div>';
+    fb.classList.add('show');
+    fb.querySelectorAll('.self button').forEach(function(bt){bt.addEventListener('click',function(){st.s[id]=parseFloat(bt.dataset.v); save(); render(); updateScore();});});
+    if(sv==null) c.dataset.state='pending'; else setState(c,sv,pts);
+  }
+  function check(){st.c[id]=1; save(); render(); updateScore();}
+  b.addEventListener('click',check);
+  host.appendChild(c);
+  register({id:id,pts:pts,check:check,isChecked:function(){return !!st.c[id];},earned:function(){return st.s[id]||0;},pending:function(){return !!st.c[id] && st.s[id]==null;},reset:function(){fb.classList.remove('show'); delete c.dataset.state; ta.value='';}});
+}
+
+/* ---------- build ---------- */
+var s1=document.getElementById('s1');
+S1.forEach(function(d,i){buildMCQ(s1,'q'+(i+1),i+1,d,0.5);});
+
+var s2=document.getElementById('s2');
+S2.forEach(function(d,i){buildTF(s2,'t'+(i+1),i+1,d);});
+
+var s3=document.getElementById('s3');
+S3.forEach(function(d,i){
+  var fields=d.f.map(function(acc){return {type:'text',acc:acc,p:0.5};});
+  buildAuto(s3,'f'+(i+1),i+1,'',fields,{inline:d.t,w:d.w,t:d.tg,ans:d.ans});
+});
+
+var s4=document.getElementById('s4');
+(function(){
+  var legend='<div class="tw"><table><tr><th>Letter</th><th>Description</th></tr>'+MATCH_OPTS.map(function(o){return '<tr><td><b>'+o[0]+'</b></td><td>'+o[1]+'</td></tr>';}).join('')+'</table></div>';
+  s4.appendChild(el('div','problem-intro','<h3>Descriptions</h3>'+legend));
+  var letters=MATCH_OPTS.map(function(o){return o[0];});
+  S4.forEach(function(m,i){
+    buildAuto(s4,'m'+(i+1),i+1,'<b>'+m[0]+'</b>',[{lab:'Letters that match',type:'multi',opts:letters,req:m[1],opt:m[2],p:0.5}],{w:m[3],t:m[4]});
+  });
+})();
+
+var s5=document.getElementById('s5');
+S5.forEach(function(d){
+  if(d.kind==='open') buildOpen(s5,d);
+  else if(d.kind==='order') buildOrder(s5,d);
+  else buildAuto(s5,d.id,d.label,d.q,d.fields,{w:d.w,t:d.t,table:d.table});
+});
+
+var s6=document.getElementById('s6');
+S6.forEach(function(d){
+  if(d.intro){s6.appendChild(el('div','problem-intro',d.intro)); return;}
+  if(d.kind==='open') buildOpen(s6,d);
+  else buildAuto(s6,d.id,d.label,d.q,d.fields,{w:d.w,t:d.t,table:d.table});
+});
+
+/* ---------- score ---------- */
+var TOTAL=items.reduce(function(s,it){return s+it.pts;},0);
+var SECS=[['I. Multiple choice','q'],['II. True / False','t'],['III. Fill in the blanks','f'],['IV. Matching','m'],['V. Short answers','s'],['VI. Problems','p']];
+function updateScore(){
+  var got=0, possible=0, checked=0, pend=0;
+  items.forEach(function(it){
+    if(!it.isChecked()) return;
+    if(it.pending()){pend++; return;}
+    checked++; got+=it.earned(); possible+=it.pts;
+  });
+  var pct = possible? Math.round(got/possible*100)+'%' : '';
+  document.getElementById('score').innerHTML = fmt(got)+' / '+fmt(possible)+' points '+(pct?'· '+pct:'')+
+    '<small>'+checked+' of '+items.length+' graded'+(pend?' · '+pend+' waiting for your self-mark':'')+' · total '+fmt(TOTAL)+'</small>';
+  renderSummary();
+}
+function renderSummary(){
+  var box=document.getElementById('summary');
+  var any=items.some(function(it){return it.isChecked();});
+  if(!any){box.classList.remove('show'); return;}
+  var rows=SECS.map(function(s){
+    var g=0,p=0,tot=0;
+    items.forEach(function(it){ if(it.id.charAt(0)!==s[1]) return; tot+=it.pts; if(it.isChecked()&&!it.pending()){g+=it.earned(); p+=it.pts;} });
+    return '<tr><td>'+s[0]+'</td><td>'+fmt(g)+' / '+fmt(p)+'</td><td>'+fmt(tot)+'</td></tr>';
+  }).join('');
+  box.innerHTML='<b>Your results so far</b><div class="tw"><table><tr><th>Section</th><th>Score (graded)</th><th>Section total</th></tr>'+rows+'</table></div><p class="sec-note" style="margin:6px 0 0">Tick “Missed only” in the top bar to review just the questions you got wrong.</p>';
+  box.classList.add('show');
+}
+
+document.getElementById('gradeAll').addEventListener('click',function(){
+  items.forEach(function(it){it.check();});
+  updateScore();
+  document.getElementById('summary').scrollIntoView({behavior:'smooth',block:'start'});
+});
+document.getElementById('resetAll').addEventListener('click',function(){
+  if(!confirm('Clear all your answers and start over?')) return;
+  st={a:{},c:{},s:{}}; save();
+  items.forEach(function(it){it.reset();});
+  updateScore();
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+document.getElementById('missedOnly').addEventListener('change',function(e){document.body.classList.toggle('missed-only',e.target.checked);});
+
+items.forEach(function(it){ if(st.c[it.id]) it.check(); });
+updateScore();
+})();
+</script>
+</body>
+</html>
